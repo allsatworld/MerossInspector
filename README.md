@@ -1,26 +1,29 @@
-# Meross Inspector 0.1 — Android 15
+# Meross Inspector para Windows 10/11
 
-Proyecto Android Java nativo sin dependencias de terceros. `compileSdk` y `targetSdk` 35, mínimo Android 8.
+Aplicación de escritorio en español para diagnóstico y control local de enchufes Meross MSS310 compatibles.
 
-## Funciones implementadas
-- Diagnóstico por IP mediante `Appliance.System.All` y tiempo de respuesta.
-- Encendido/apagado mediante `Appliance.Control.Toggle`.
-- Potencia, tensión e intensidad mediante `Appliance.Control.Electricity`.
-- Firmas locales MD5 según protocolo Meross documentado por la comunidad.
+## Funciones
+- Detecta automáticamente una posible subred local /24 y busca equipos con puerto HTTP 80 abierto.
+- Selecciona una IP detectada o introduce la IP del enchufe.
+- Diagnostica modelo y estado, mide potencia (W), tensión (V) e intensidad (A) si el firmware lo permite.
+- Envía órdenes de encendido y apagado con autenticación Meross mediante clave local.
+- No utiliza servicios en la nube. La clave solo permanece en memoria durante la ejecución.
 
-## Limitaciones importantes
-- **No hay autodetección todavía**: la IP se introduce manualmente.
-- Requiere la **device key local** del enchufe, no la contraseña de Meross. No se incluye extracción de credenciales.
-- Compatible solo con dispositivos que acepten la API HTTP local y esos namespaces. ToggleX y otras variantes quedan pendientes.
-- El control no se ha probado con un enchufe físico y el APK no se ha compilado en este entorno.
-- No se almacenan IP ni claves. HTTP local no cifra el tráfico: utilizar únicamente en una red WiFi confiable.
-- No muestra kWh acumulados aún. El modelo debe soportar monitorización eléctrica para mostrar W/V/A.
+**Importante:** El escáner identifica equipos que responden en el puerto 80, no garantiza que sean Meross. Para identificar el enchufe hace falta la clave local Meross. El control local depende del firmware y la conectividad del MSS310.
 
-## Compilar
-1. Abrir la carpeta `MerossInspector` en Android Studio.
-2. Instalar SDK Android 35 y sincronizar Gradle (AGP 8.7.3, JDK 17).
-3. Ejecutar **Build > Build APK(s)**.
-4. El APK de depuración estará en `app/build/outputs/apk/debug/app-debug.apk`.
+## Obtener el EXE portátil desde GitHub Actions
+1. Sube `meross_inspector.py` y `.github/workflows/windows-exe.yml` a la raíz de un repositorio GitHub (respeta la ruta de `.github`).
+2. Entra en **Actions > Compilar Meross Inspector Windows EXE > Run workflow**.
+3. Cuando la ejecución aparezca en verde, abre la ejecución y descarga el artifact **MerossInspector-Windows-EXE**.
+4. Descomprime el ZIP y ejecuta `MerossInspector.exe` en Windows 10/11. No necesita Python instalado.
 
-## Próximas mejoras
-Autodetección con consentimiento, configuración segura de claves, ToggleX, ConsumptionX, diagnóstico detallado y pruebas con modelos concretos.
+El EXE se construye en un runner Windows de GitHub. No ha sido compilado ni probado en Windows en este entorno Linux.
+
+## Ejecutar desde código fuente
+Con Python 3.10 o posterior: `python meross_inspector.py`. Solo usa la biblioteca estándar de Python.
+
+## Seguridad
+- Escanea únicamente redes IPv4 privadas de máximo 254 hosts.
+- Usa la herramienta solo en redes propias o donde tengas autorización.
+- No subas la clave Meross a GitHub; introdúcela en la interfaz de la aplicación.
+- El protocolo HTTP local de Meross no cifra el tráfico; usa una red Wi-Fi de confianza.
